@@ -3,13 +3,20 @@
 #include <Ezo_i2c.h>  // include the EZO I2C library from https://github.com/Atlas-Scientific/Ezo_I2c_lib
 #include <sequencer4.h>  // imports a 2 function sequencer 
 #include <Ezo_i2c_util.h>  // brings in common print statements
+#include <LiquidCrystal_I2C.h>
 
 //define I2C addresses for all the sensors and devices except SensResp 
-#define PumpResp_address 100  // define I2C address for PumpResp
+#define PumpResp_address 99  // define I2C address for PumpResp
 #define PumpResp_size 5  // define the maximum size of 'Phase' string from PumpResp
+int LED = 4;
+
+String phase = "";
+
+LiquidCrystal_I2C MyLCD(0x27, 20, 4); // Creates I2C LCD Object With (Address=0x27, Cols=20, Rows=4)
+bool lcd_ready = false;
 
 // AtlasScientific devices are defined using their own functions:
-Ezo_board RTD = Ezo_board(91, "");  // create a Temperature circuit object, who's address is 91 and name is "PH"
+Ezo_board RTD = Ezo_board(100, "");  // create a Temperature circuit object, who's address is 91 and name is "PH"
 Ezo_board DO_1 = Ezo_board(101, "");  // create an DO circuit object who's address is 101
 Ezo_board DO_2 = Ezo_board(102, "");  // create an DO circuit object who's address is 102
 Ezo_board DO_3 = Ezo_board(103, "");  // create an DO circuit object who's address is 103
@@ -28,16 +35,44 @@ Sequencer4 Seq(&step1, 50,
                &step4, 30);
 
 void setup(){
-  digitalWrite(A4, LOW);
-  digitalWrite(A5, LOW);
   Serial.begin(9600);  // start the serial communication to PC with default baud rate
   Serial.println("CLEARRANGE,A,2,H,1000000"); // trick to get rid of AM-PM
+  pinMode(LED, OUTPUT); 
+  digitalWrite(LED, HIGH);
+  
   Wire.begin();  // start the I2C without an address inside as SensResp is a master device
-  Seq.reset();  // initialize the sequencer
+  
+  MyLCD.init();
+  MyLCD.backlight();
+  MyLCD.noCursor();
+  MyLCD.clear();
 }
 
 void loop() {
   Seq.run();  // run the sequencer to do the polling
+    
+if (lcd_ready) {
+    lcd_ready = false;
+
+    MyLCD.clear();
+
+    MyLCD.setCursor(0, 0);
+    MyLCD.print("Temp: ");
+    MyLCD.print(RTD.get_last_received_reading());
+
+
+    MyLCD.setCursor(0, 1);
+    MyLCD.print("Temp: ");
+    MyLCD.print(RTD.get_last_received_reading());
+
+    MyLCD.setCursor(0, 2);
+    MyLCD.print("DO1: ");
+    MyLCD.print("----");
+
+    MyLCD.setCursor(0, 3);
+    MyLCD.print("DO2: ");
+    MyLCD.print("----");
+}
 }
 
 void step1() {
@@ -81,11 +116,22 @@ void step3() {
 void step4(){
   // Request data and read response from PumpResp
   Wire.requestFrom(PumpResp_address, PumpResp_size); 
-  String phase = ""; // add characters to a string (i.e. phase)
-  while (Wire.available()) {
+  phase = ""; // add characters to a string (i.e. phase)
+   while (Wire.available()) {
     char b = Wire.read();
+    
+    // Ignore common non-printable or trailing padding bytes
+    if (b == '\0' || b == '\r' || b == '\n') {
+      break; // Stop reading if the slave sent a terminator
+    }
+    
     phase += b;
   } 
+  
+  // Explicitly trim any unexpected accidental whitespace
+  phase.trim();
+  
+  lcd_ready = true;
 
   Serial.print(phase);
   Serial.print("\t");

@@ -3,8 +3,8 @@
 ////////////////////
 
 // Set the length of measurement and flush phases (in seconds)
-int FLUSH = 300;       // LED is on
-int MEASUREMENT = 900; // LED is blinking
+int FLUSH = 5;       // LED is on
+int MEASUREMENT = 15; // LED is blinking
 
 /////////////////////////
 // IMPLEMENTATION CODE //
@@ -12,11 +12,11 @@ int MEASUREMENT = 900; // LED is blinking
 
 // Include Arduino Wire library for I2C protocol
 #include <Wire.h>
-#define PumpResp_address 100 // define I2C address for PumpResp
+#define PumpResp_address 99 // define I2C address for PumpResp
 #define PumpResp_size 5  // define the maximum size of 'Phase' string from PumpResp
 
-int LED = 5;
-int RELAY = 3;
+int LED = 4;
+int RELAY = 5;
 int PERIOD = 1;
 String phase, F, M, f = "F", m = "M";
 
