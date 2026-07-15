@@ -1,5 +1,5 @@
 # SensResp
-SensResp is a dissolved oxygen logger used with galvanic probes in intermittent‑flow aquatic respirometry. SensResp works together with [PumpResp](https://github.com/embedded-sergey/PumpResp) by receiving and logging phase information from the pump controller during measurement cycles.
+SensResp is a dissolved‑oxygen transmitter for galvanic probes used in intermittent‑flow aquatic respirometry.   It works together with [PumpResp](https://github.com/yourusername/PumpResp) by acquiring pump phase from it, then transmitting data over USB to a PC for logging.
 
 It is part of the FishResp project (more information at https://fishresp.org).
 
