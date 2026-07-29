@@ -12,15 +12,14 @@ int LED = 4;
 
 String phase = "";
 
-LiquidCrystal_I2C MyLCD(0x27, 20, 4); // Creates I2C LCD Object With (Address=0x27, Cols=20, Rows=4)
-bool lcd_ready = false;
+LiquidCrystal_I2C LCD(0x27, 20, 4); // Creates I2C LCD Object With (Address=0x27, Cols=20, Rows=4)
 
 // AtlasScientific devices are defined using their own functions:
-Ezo_board RTD = Ezo_board(100, "");  // create a Temperature circuit object, who's address is 91 and name is "PH"
-Ezo_board DO_1 = Ezo_board(101, "");  // create an DO circuit object who's address is 101
-Ezo_board DO_2 = Ezo_board(102, "");  // create an DO circuit object who's address is 102
-Ezo_board DO_3 = Ezo_board(103, "");  // create an DO circuit object who's address is 103
-Ezo_board DO_4 = Ezo_board(104, "");  // create an DO circuit object who's address is 104
+Ezo_board RTD = Ezo_board(100, "");  // create an RTD circuit object which address is 100
+Ezo_board DO_1 = Ezo_board(101, "");
+Ezo_board DO_2 = Ezo_board(102, "");
+Ezo_board DO_3 = Ezo_board(103, "");
+Ezo_board DO_4 = Ezo_board(104, ""); 
 
 // Forward declarations of functions to use them in the sequencer before defining them
 void step1();  
@@ -42,37 +41,14 @@ void setup(){
   
   Wire.begin();  // start the I2C without an address inside as SensResp is a master device
   
-  MyLCD.init();
-  MyLCD.backlight();
-  MyLCD.noCursor();
-  MyLCD.clear();
+  LCD.init();
+  LCD.backlight();
+  LCD.noCursor();
+  LCD.clear();
 }
 
 void loop() {
   Seq.run();  // run the sequencer to do the polling
-    
-if (lcd_ready) {
-    lcd_ready = false;
-
-    MyLCD.clear();
-
-    MyLCD.setCursor(0, 0);
-    MyLCD.print("Temp: ");
-    MyLCD.print(RTD.get_last_received_reading());
-
-
-    MyLCD.setCursor(0, 1);
-    MyLCD.print("Temp: ");
-    MyLCD.print(RTD.get_last_received_reading());
-
-    MyLCD.setCursor(0, 2);
-    MyLCD.print("DO1: ");
-    MyLCD.print("----");
-
-    MyLCD.setCursor(0, 3);
-    MyLCD.print("DO2: ");
-    MyLCD.print("----");
-}
 }
 
 void step1() {
@@ -130,9 +106,6 @@ void step4(){
   
   // Explicitly trim any unexpected accidental whitespace
   phase.trim();
-  
-  lcd_ready = true;
-
   Serial.print(phase);
   Serial.print("\t");
 
@@ -155,8 +128,46 @@ void step4(){
   float d = DO_3.get_last_received_reading();
   float e = DO_4.get_last_received_reading();
 
-  Serial.println((String) "DATA,DATE,TIME," + phase + (",") + a + (",") + b + (",") + c + (",")  + d+ (",") + e);
+  Serial.println((String) "DATA,DATE,TIME," + phase + (",") + a + (",") + b + (",") + c + (",")  + d + (",") + e);
+
+  LCD_code();  // update LCD here
 }
+
+
+void LCD_code() {
+
+    // --- DO readings ---
+    LCD.setCursor(0, 0);
+    LCD.print("DO1: ");
+    LCD.print(String(DO_1.get_last_received_reading()) + "   ");
+
+    LCD.setCursor(0, 1);
+    LCD.print("DO2: ");
+    LCD.print(String(DO_2.get_last_received_reading()) + "   ");
+
+    LCD.setCursor(0, 2);
+    LCD.print("DO3: ");
+    LCD.print(String(DO_3.get_last_received_reading()) + "   ");
+
+    LCD.setCursor(0, 3);
+    LCD.print("DO4: ");
+    LCD.print(String(DO_4.get_last_received_reading()) + "   ");
+
+    // --- Phase ---
+    LCD.setCursor(13, 0);
+    LCD.print("Phase:");
+
+    LCD.setCursor(13, 1);
+    LCD.print(phase + "   ");  // pad to clear leftovers
+
+    // --- Temperature ---
+    LCD.setCursor(13, 2);
+    LCD.print("Temp:");
+
+    LCD.setCursor(13, 3);
+    LCD.print(String(RTD.get_last_received_reading()) + "  ");
+}
+
 
 // Sources:
 // 1. I2C mode instructionsfor communication between two Arduinos: 
