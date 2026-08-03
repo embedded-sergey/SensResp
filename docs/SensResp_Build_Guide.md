@@ -89,7 +89,7 @@ Prices listed in this BOM exclude VAT, customs duties, and delivery costs.
 | LED, 5 mm | Generic | 1 pc | 6 | 6 | Bulk pack (50–200 pcs) |
 | Resistor, 220 Ω, ¼ W | Generic | 1 pc | 6 | 6 | Bulk pack (20–200 pcs) |
 | Resistor, 1.6 kΩ, ¼ W | Generic | 2 pcs | 6 | 6 | Bulk pack (20–200 pcs) |
-| Screw terminal block connector, 2-pin | Generic | 1 pc | 4 | 4 | Bulk pack (20–50 pcs) |
+| Screw terminal block connector, 2-pin | Generic | 3 pcs | 4 | 4 | Bulk pack (20–50 pcs) |
 | 20x4 LCD with I²C interface, HD44780 driver, 5V | Generic | 1 pc | 10 | 10 | - |
 | Female to male jumper wires, square jumpers, 10 cm | Generic | 1 kit | 5 | 5 | – |
 | Solderless breadboard BB830, 165.1 x 54.6 x 8.5 mm | Generic | 1 pc | 10 | 10 | Check reviews because cheap clones often have loose contacts, bad rails, and high resistance that disrupts I²C |
